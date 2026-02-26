@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h3 class="mb-4">Analytics Dashboard</h3>
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card p-3 text-center bg-primary text-white">
+            <h5>Total Resumes</h5>
+            <h3>{{ total }}</h3>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card p-3 text-center bg-success text-white">
+            <h5>Selected</h5>
+            <h3>{{ selected }}</h3>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card p-3 text-center bg-danger text-white">
+            <h5>Rejected</h5>
+            <h3>{{ rejected }}</h3>
+        </div>
+    </div>
+</div>
+
+<div class="card p-4">
+    <canvas id="statusChart"></canvas>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    const ctx = document.getElementById('statusChart');
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Selected', 'Rejected'],
+            datasets: [{
+                label: 'Candidate Status',
+                data: [{{ selected }}, {{ rejected }}],
+                backgroundColor: ['#28a745', '#dc3545']
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false }
+            }
+        }
+    });
+</script>
+
+{% endblock %}

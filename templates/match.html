@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Resume Matching | HireSmart AI</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<div class="navbar">
+    HireSmart AI
+    <div>
+        <a href="/dashboard">Dashboard</a>
+        <a href="/analytics">Analytics</a>
+        <a href="/logout">Logout</a>
+    </div>
+</div>
+
+<div style="display:flex; justify-content:center; margin-top:80px;">
+    <div class="card" style="width:600px;">
+        <h2>Upload Resume for Matching</h2>
+
+        {% if error %}
+            <p style="color:red;">{{ error }}</p>
+        {% endif %}
+
+        <form action="/match" method="post" enctype="multipart/form-data">
+            <label>Upload Resume (PDF)</label>
+            <input type="file" name="file" required>
+
+            <label>Job Description</label>
+            <label>Select Job</label>
+<select name="job_id" required>
+    {% for job in jobs %}
+        <option value="{{ job.id }}">{{ job.title }}</option>
+    {% endfor %}
+</select>
+
+            <button class="btn-primary">Analyze Resume</button>
+        </form>
+    </div>
+</div>
+
+</body>
+</html>

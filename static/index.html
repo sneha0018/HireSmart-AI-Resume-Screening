@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>HireSmart AI - Resume Matcher</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f9;
+            display: flex;
+            justify-content: center;
+            padding: 50px;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            width: 600px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 15px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        input, textarea, button {
+            width: 100%;
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f0f8ff;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 18px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <h1>HireSmart AI</h1>
+
+    <input type="file" id="resume" accept=".pdf">
+    <textarea id="job_description" rows="6" placeholder="Paste Job Description here..."></textarea>
+
+    <button onclick="matchResume()">Match Resume</button>
+
+    <div class="result" id="result"></div>
+</div>
+
+<script>
+async function matchResume() {
+    const fileInput = document.getElementById("resume");
+    const jobDescription = document.getElementById("job_description").value;
+    const resultDiv = document.getElementById("result");
+
+    if (!fileInput.files[0] || !jobDescription) {
+        resultDiv.innerHTML = "Please upload resume and enter job description.";
+        return;
+    }
+
+    let formData = new FormData();
+    formData.append("resume", fileInput.files[0]);
+    formData.append("job_description", jobDescription);
+
+    resultDiv.innerHTML = "Processing...";
+
+    try {
+        const response = await fetch("/match", {
+            method: "POST",
+            body: formData
+        });
+
+        const data = await response.json();
+
+        resultDiv.innerHTML =
+            "Match Score: <b>" + data.match_score + "%</b><br>Status: <b>" + data.status + "</b>";
+
+    } catch (error) {
+        resultDiv.innerHTML = "Error connecting to server.";
+    }
+}
+</script>
+
+</body>
+</html>
+

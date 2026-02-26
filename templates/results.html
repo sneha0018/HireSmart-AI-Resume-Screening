@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="result-card">
+    <h2>🎯 Final Match Score</h2>
+    <div class="score">{{ score }}%</div>
+
+    <p><strong>TF-IDF Similarity:</strong> {{ tfidf_score }}%</p>
+    <p><strong>Skill Match Score:</strong> {{ skill_score }}%</p>
+
+    <h3>✅ Matched Skills:</h3>
+    <ul>
+        {% for skill in matched_skills %}
+            <li>{{ skill }}</li>
+        {% endfor %}
+    </ul>
+
+    <a href="/match" class="btn">Try Another</a>
+</div>
+{% endblock %}

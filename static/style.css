@@ -1,0 +1,81 @@
+/* Import Font */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+
+body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    background: linear-gradient(135deg, #eef2ff, #fdf2f8);
+    color: #1e293b;
+}
+
+/* Navbar */
+.navbar {
+    background: linear-gradient(90deg, #2563eb, #7c3aed);
+    padding: 15px 40px;
+    color: white;
+    font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.navbar a {
+    color: white;
+    text-decoration: none;
+    margin-left: 20px;
+    font-weight: 500;
+}
+
+.navbar a:hover {
+    opacity: 0.8;
+}
+
+/* Card */
+.card {
+    background: white;
+    padding: 30px;
+    border-radius: 14px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+}
+
+/* Buttons */
+.btn-primary {
+    background: linear-gradient(90deg, #2563eb, #7c3aed);
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+}
+
+/* Inputs */
+input, textarea {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #cbd5e1;
+    margin-top: 8px;
+    margin-bottom: 15px;
+    font-family: 'Poppins';
+}
+
+/* Stats Cards */
+.stat-box {
+    padding: 20px;
+    border-radius: 12px;
+    color: white;
+    font-weight: 600;
+    font-size: 20px;
+    text-align: center;
+}
+
+.blue { background: linear-gradient(90deg,#2563eb,#3b82f6); }
+.green { background: linear-gradient(90deg,#16a34a,#22c55e); }
+.red { background: linear-gradient(90deg,#dc2626,#ef4444); }

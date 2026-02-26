@@ -1,0 +1,48 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #7b2ff7, #f107a3);
+    color: white;
+}
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px 40px;
+    background: rgba(0,0,0,0.3);
+}
+
+nav a {
+    color: white;
+    margin-left: 20px;
+    text-decoration: none;
+}
+
+.hero {
+    text-align: center;
+    margin-top: 100px;
+}
+
+.btn {
+    padding: 10px 20px;
+    background: white;
+    color: purple;
+    text-decoration: none;
+    border-radius: 5px;
+}
+
+.card, .result-card {
+    background: white;
+    color: black;
+    padding: 30px;
+    border-radius: 10px;
+    width: 450px;
+    margin: 50px auto;
+}
+
+.score {
+    font-size: 40px;
+    font-weight: bold;
+    text-align: center;
+    margin: 20px 0;
+}

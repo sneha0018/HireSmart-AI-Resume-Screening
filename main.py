@@ -16,6 +16,9 @@ from nltk.corpus import stopwords
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from botocore.config import Config
+from fastapi.responses import StreamingResponse
+import csv
+import io
 
 # -----------------------------
 # NLTK Setup
@@ -295,21 +298,51 @@ def dashboard(request: Request):
     if "user" not in request.session:
         return RedirectResponse(url="/login", status_code=302)
 
+    search = request.query_params.get("search")
+    sort = request.query_params.get("sort")
+    selected_job = request.query_params.get("job_id")
+
     conn = get_connection()
     cursor = conn.cursor()
 
-    cursor.execute("""
-       SELECT r.id, r.resume_name, r.match_score, r.status, j.title
-       FROM results r
-       JOIN jobs j ON r.job_id = j.id
-       ORDER BY r.match_score DESC
-    """)
-    results = cursor.fetchall()
+    # Get all jobs for dropdown
+    cursor.execute("SELECT id, title FROM jobs ORDER BY created_at DESC")
+    jobs = cursor.fetchall()
 
-    total = len(results)
-    selected = len([r for r in results if r["status"] == "Selected"])
-    rejected = total - selected
-    avg_score = round(sum([r["match_score"] for r in results]) / total, 2) if total > 0 else 0
+    # Base query
+    query = """
+        SELECT r.id, r.resume_name, r.match_score, r.status,
+               r.notes, j.title
+        FROM results r
+        LEFT JOIN jobs j ON r.job_id = j.id
+    """
+
+    conditions = []
+    values = []
+
+    # Search filter
+    if search:
+        conditions.append("(r.resume_name ILIKE %s OR j.title ILIKE %s)")
+        values.extend([f"%{search}%", f"%{search}%"])
+
+    # Job filter
+    if selected_job:
+        conditions.append("r.job_id = %s")
+        values.append(selected_job)
+
+    # Apply conditions
+    if conditions:
+        query += " WHERE " + " AND ".join(conditions)
+
+    # Sorting
+    if sort == "score":
+        query += " ORDER BY r.match_score DESC"
+    else:
+        query += " ORDER BY r.id DESC"
+
+    # Execute
+    cursor.execute(query, values)
+    results = cursor.fetchall()
 
     conn.close()
 
@@ -318,10 +351,8 @@ def dashboard(request: Request):
         {
             "request": request,
             "results": results,
-            "total": total,
-            "selected": selected,
-            "rejected": rejected,
-            "avg_score": avg_score,
+            "jobs": jobs,
+            "selected_job": selected_job
         },
     )
 #-------------------------------
@@ -385,6 +416,94 @@ def download_resume(request: Request, resume_id: int):
 
     return RedirectResponse(url)
 # -----------------------------
+# UPDATE CANDIDATE
+# -----------------------------
+
+
+@app.post("/update-candidate/{candidate_id}")
+async def update_candidate(
+    request: Request,
+    candidate_id: int,
+    status: str = Form(...),
+    notes: str = Form(None)
+):
+    if "user" not in request.session:
+        return RedirectResponse(url="/login", status_code=302)
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        UPDATE results
+        SET status = %s,
+            notes = %s
+        WHERE id = %s
+    """, (status, notes, candidate_id))
+
+    conn.commit()
+    conn.close()
+
+    return RedirectResponse(url="/dashboard", status_code=302)
+# -----------------------------
+# DELETE RESUME
+# -----------------------------
+@app.get("/delete/{result_id}")
+def delete_resume(result_id: int):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    # Get s3 key first
+    cursor.execute("SELECT s3_key FROM results WHERE id = %s", (result_id,))
+    row = cursor.fetchone()
+
+    if row:
+        s3.delete_object(Bucket=S3_BUCKET, Key=row[0])
+
+    cursor.execute("DELETE FROM results WHERE id = %s", (result_id,))
+    conn.commit()
+    conn.close()
+
+    return RedirectResponse(url="/dashboard", status_code=302)
+# -----------------------------
+# EXPORT
+# -----------------------------
+@app.get("/export")
+def export_csv():
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT resume_name, match_score, status
+        FROM results
+        ORDER BY id DESC
+    """)
+    rows = cursor.fetchall()
+    conn.close()
+
+    output = io.StringIO()
+    writer = csv.writer(output)
+
+    # Header
+    writer.writerow(["Resume Name", "Match Score", "Status"])
+
+    # Correct dictionary access
+    for row in rows:
+        writer.writerow([
+            row["resume_name"],
+            float(row["match_score"]),
+            row["status"]
+        ])
+
+    output.seek(0)
+
+    return StreamingResponse(
+        iter([output.getvalue()]),
+        media_type="text/csv",
+        headers={
+            "Content-Disposition": "attachment; filename=hireSmart_results.csv"
+        }
+    )
+# -----------------------------
 # CREATE JOB (ADMIN)
 # -----------------------------
 @app.get("/create-job", response_class=HTMLResponse)
@@ -416,3 +535,171 @@ async def create_job(
     conn.close()
 
     return RedirectResponse(url="/dashboard", status_code=302)
+
+
+#-----------------------------
+#candidate-register
+#----------------------------
+
+@app.get("/candidate-register", response_class=HTMLResponse)
+def candidate_register_page(request: Request):
+    return templates.TemplateResponse(
+        "candidate_register.html",
+        {"request": request}
+    )
+
+
+@app.post("/candidate-register")
+def candidate_register(
+    request: Request,
+    name: str = Form(...),
+    email: str = Form(...),
+    password: str = Form(...)
+):
+
+    hashed_password = pwd_context.hash(password)
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute(
+            "INSERT INTO candidates (name, email, password) VALUES (%s, %s, %s)",
+            (name, email, hashed_password)
+        )
+        conn.commit()
+    except:
+        conn.close()
+        return templates.TemplateResponse(
+            "candidate_register.html",
+            {"request": request, "error": "Email already exists"}
+        )
+
+    conn.close()
+
+    return RedirectResponse(url="/candidate-login", status_code=302)
+
+
+#-------------------------------
+#candidate login
+#-----------------------------------
+
+
+
+@app.get("/candidate-login", response_class=HTMLResponse)
+def candidate_login_page(request: Request):
+    return templates.TemplateResponse(
+        "candidate_login.html",
+        {"request": request}
+    )
+@app.post("/candidate-login")
+def candidate_login(
+    request: Request,
+    email: str = Form(...),
+    password: str = Form(...)
+):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        "SELECT id, password FROM candidates WHERE email = %s",
+        (email,)
+    )
+    user = cursor.fetchone()
+    conn.close()
+
+    if not user:
+        return templates.TemplateResponse(
+            "candidate_login.html",
+            {"request": request, "error": "Invalid email or password"}
+        )
+
+    user_id = user["id"]
+    hashed_password = user["password"]
+
+    if not pwd_context.verify(password, hashed_password):
+        return templates.TemplateResponse(
+            "candidate_login.html",
+            {"request": request, "error": "Invalid email or password"}
+        )
+
+    # Store session
+    request.session["user"] = email
+    request.session["role"] = "candidate"
+    request.session["candidate_id"] = user_id
+
+    return RedirectResponse(url="/candidate-dashboard", status_code=302)
+#------------------------------------------
+#candidat_dashboard
+#---------------------------------------
+@app.get("/candidate-dashboard", response_class=HTMLResponse)
+def candidate_dashboard(request: Request):
+
+    # Only candidate can access
+    if request.session.get("role") != "candidate":
+        return RedirectResponse(url="/candidate-login", status_code=302)
+
+    candidate_id = request.session.get("candidate_id")
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    # Get all jobs
+    cursor.execute("SELECT id, title, description FROM jobs ORDER BY created_at DESC")
+    jobs = cursor.fetchall()
+
+    # Get candidate applications
+    cursor.execute("""
+        SELECT a.id, j.title, a.match_score, a.status, a.notes
+        FROM applications a
+        JOIN jobs j ON a.job_id = j.id
+        WHERE a.candidate_id = %s
+        ORDER BY a.applied_at DESC
+    """, (candidate_id,))
+
+    applications = cursor.fetchall()
+    conn.close()
+
+    return templates.TemplateResponse(
+        "candidate_dashboard.html",
+        {
+            "request": request,
+            "jobs": jobs,
+            "applications": applications
+        }
+    )
+#---------------------------------------
+#candidate apply
+#-----------------------------------------
+
+
+@app.get("/apply/{job_id}", response_class=HTMLResponse)
+def apply_page(request: Request, job_id: int):
+
+    if request.session.get("role") != "candidate":
+        return RedirectResponse(url="/candidate-login", status_code=302)
+
+    return templates.TemplateResponse(
+        "apply.html",
+        {
+            "request": request,
+            "job_id": job_id
+        }
+    )
+
+
+
+@app.get("/apply/{job_id}", response_class=HTMLResponse)
+def apply_page(request: Request, job_id: int):
+
+    if request.session.get("role") != "candidate":
+        return RedirectResponse(url="/candidate-login", status_code=302)
+
+    return templates.TemplateResponse(
+        "apply.html",
+        {
+            "request": request,
+            "job_id": job_id
+        }
+    )

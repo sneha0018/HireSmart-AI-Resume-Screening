@@ -1,190 +1,393 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Dashboard | HireSmart AI</title>
-    <link rel="stylesheet" href="/static/style.css">
+<title>Admin Dashboard | HireSmart AI</title>
 
-    <style>
-        .container {
-            max-width: 1100px;
-            margin: 60px auto;
-        }
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-        .stats-row {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 40px;
-        }
-
-        .stat-box {
-            flex: 1;
-            padding: 30px;
-            border-radius: 16px;
-            color: white;
-            font-weight: 600;
-            text-align: center;
-            box-shadow: 0 12px 25px rgba(0,0,0,0.08);
-            transition: 0.3s ease;
-        }
-
-        .stat-box:hover {
-            transform: translateY(-5px);
-        }
-
-        .stat-title {
-            font-size: 18px;
-            opacity: 0.9;
-        }
-
-        .stat-number {
-            font-size: 36px;
-            margin-top: 10px;
-        }
-
-        .blue { background: linear-gradient(90deg,#2563eb,#3b82f6); }
-        .green { background: linear-gradient(90deg,#16a34a,#22c55e); }
-        .red { background: linear-gradient(90deg,#dc2626,#ef4444); }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-        }
-
-        th, td {
-            padding: 15px;
-            text-align: left;
-        }
-
-        th {
-            background: #f1f5f9;
-            font-weight: 600;
-        }
-
-        tr:nth-child(even) {
-            background: #f8fafc;
-        }
-
-        .badge-selected {
-            color: white;
-            background: #16a34a;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 14px;
-        }
-
-        .badge-rejected {
-            color: white;
-            background: #dc2626;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 14px;
-        }
-      
-        .btn-download {
-    background: linear-gradient(90deg,#2563eb,#7c3aed);
-    color: white;
-    padding: 8px 14px;
-    border-radius: 8px;
-    text-decoration: none;
-    font-size: 14px;
-    font-weight: 500;
-    transition: 0.3s ease;
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Poppins',sans-serif;
 }
 
-.btn-download:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+body{
+background:linear-gradient(135deg,#eef2ff,#fdf2f8);
+min-height:100vh;
 }
-    </style>
+
+.navbar{
+background:linear-gradient(90deg,#4f46e5,#9333ea);
+color:white;
+padding:20px 60px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+font-weight:600;
+font-size:18px;
+}
+
+.navbar a{
+color:white;
+text-decoration:none;
+margin-left:30px;
+font-weight:500;
+}
+
+.container{
+max-width:1400px;
+margin:70px auto;
+padding:0 30px;
+}
+
+h1{
+font-size:36px;
+margin-bottom:50px;
+color:#1e293b;
+}
+
+/* Stats */
+
+.stats-row{
+display:flex;
+gap:30px;
+margin-bottom:60px;
+flex-wrap:wrap;
+}
+
+.stat-box{
+flex:1;
+min-width:250px;
+padding:40px;
+border-radius:25px;
+color:white;
+text-align:center;
+box-shadow:0 20px 50px rgba(0,0,0,0.1);
+transition:0.3s;
+}
+
+.stat-box:hover{
+transform:translateY(-10px);
+}
+
+.blue{background:linear-gradient(135deg,#3b82f6,#2563eb);}
+.green{background:linear-gradient(135deg,#22c55e,#16a34a);}
+.red{background:linear-gradient(135deg,#ef4444,#dc2626);}
+
+.stat-title{
+font-size:18px;
+opacity:0.9;
+}
+
+.stat-number{
+font-size:48px;
+margin-top:15px;
+font-weight:700;
+}
+
+/* Controls */
+
+.controls{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:40px;
+flex-wrap:wrap;
+gap:20px;
+}
+
+select{
+padding:10px 15px;
+border-radius:10px;
+border:1px solid #cbd5e1;
+font-size:14px;
+}
+
+.btn{
+padding:10px 20px;
+border-radius:12px;
+border:none;
+cursor:pointer;
+font-weight:600;
+transition:0.3s;
+}
+
+.btn-filter{
+background:#6366f1;
+color:white;
+}
+
+.btn-export{
+background:linear-gradient(90deg,#22c55e,#16a34a);
+color:white;
+}
+
+.btn-update{
+background:linear-gradient(90deg,#4f46e5,#9333ea);
+color:white;
+}
+
+.btn-delete{
+background:#ef4444;
+color:white;
+}
+
+.btn:hover{
+transform:translateY(-3px);
+box-shadow:0 10px 25px rgba(0,0,0,0.15);
+}
+
+/* Table Card */
+
+.table-card{
+background:white;
+border-radius:25px;
+padding:30px;
+box-shadow:0 25px 60px rgba(0,0,0,0.08);
+overflow-x:auto;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+min-width:900px;
+}
+
+th{
+text-align:left;
+padding:18px;
+font-size:14px;
+font-weight:600;
+color:#475569;
+}
+
+td{
+padding:20px 18px;
+font-size:14px;
+vertical-align:middle;
+}
+
+tr:hover{
+background:#f8fafc;
+border-radius:20px;
+}
+
+/* Progress */
+
+.progress-container{
+background:#e2e8f0;
+border-radius:30px;
+height:26px;
+width:160px;
+}
+
+.progress-bar{
+height:100%;
+text-align:center;
+color:white;
+font-size:13px;
+font-weight:600;
+line-height:26px;
+border-radius:30px;
+background:linear-gradient(90deg,#3b82f6,#9333ea);
+}
+
+/* Badge */
+
+.badge{
+padding:6px 16px;
+border-radius:25px;
+color:white;
+font-size:13px;
+font-weight:500;
+}
+
+.selected{background:#16a34a;}
+.rejected{background:#dc2626;}
+
+/* Notes & Actions */
+
+.notes-box{
+display:flex;
+flex-direction:column;
+gap:10px;
+}
+
+textarea{
+width:100%;
+padding:10px;
+border-radius:12px;
+border:1px solid #cbd5e1;
+font-size:13px;
+resize:none;
+}
+
+/* Mobile */
+
+@media(max-width:900px){
+.stats-row{
+flex-direction:column;
+}
+
+.navbar{
+padding:15px 20px;
+font-size:14px;
+}
+
+.container{
+padding:0 15px;
+}
+
+h1{
+font-size:26px;
+}
+}
+
+</style>
 </head>
 
 <body>
 
 <div class="navbar">
-    HireSmart AI
-    <div>
-        <a href="/match">Match</a>
-        <a href="/analytics">Analytics</a>
-        <a href="/logout">Logout</a>
-        <a href="/create-job">Create Job</a>
-    </div>
+HireSmart AI Admin
+<div>
+<a href="/match">Match</a>
+<a href="/analytics">Analytics</a>
+<a href="/create-job">Create Job</a>
+<a href="/logout">Logout</a>
+</div>
 </div>
 
 <div class="container">
 
-    <h1 style="margin-bottom:30px;">Admin Dashboard</h1>
+<h1>Admin Dashboard</h1>
 
-    <!-- Stats Row -->
-    <div class="stats-row">
+<div class="stats-row">
+<div class="stat-box blue">
+<div class="stat-title">Total Resumes</div>
+<div class="stat-number">{{ total }}</div>
+</div>
 
-        <div class="stat-box blue">
-            <div class="stat-title">Total Resumes</div>
-            <div class="stat-number">{{ total }}</div>
-        </div>
+<div class="stat-box green">
+<div class="stat-title">Selected</div>
+<div class="stat-number">{{ selected }}</div>
+</div>
 
-        <div class="stat-box green">
-            <div class="stat-title">Selected</div>
-            <div class="stat-number">{{ selected }}</div>
-        </div>
+<div class="stat-box red">
+<div class="stat-title">Rejected</div>
+<div class="stat-number">{{ rejected }}</div>
+</div>
+</div>
 
-        <div class="stat-box red">
-            <div class="stat-title">Rejected</div>
-            <div class="stat-number">{{ rejected }}</div>
-        </div>
+<div class="controls">
+<form method="get" action="/dashboard" style="display:flex; gap:15px; flex-wrap:wrap;">
 
-    </div>
+<input type="text" name="search"
+placeholder="Search resume or role..."
+value="{{ request.query_params.get('search','') }}"
+style="padding:10px; border-radius:10px; border:1px solid #cbd5e1;">
 
-    <!-- Results Table -->
-    <h2 style="margin-bottom:20px;">Recent Resume Evaluations</h2>
+<select name="sort">
+<option value="">Latest</option>
+<option value="score">Highest Score</option>
+</select>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Resume Name</th>
-                <th>Applied Role</th>
-                <th>Match Score</th>  
-                <th>Status</th>
-                <th>Download</th>
+<select name="job_id">
+<option value="">All Jobs</option>
+{% for job in jobs %}
+<option value="{{ job.id }}"
+{% if selected_job == job.id %}selected{% endif %}>
+{{ job.title }}
+</option>
+{% endfor %}
+</select>
 
-            </tr>
-        </thead>
-        <tbody>
+<button class="btn btn-filter">Apply</button>
+
+</form>
+
+<a href="/export" class="btn btn-export">Export CSV</a>
+</div>
+
+<div class="table-card">
+
+<table>
+<thead>
+<tr>
+<th>Resume</th>
+<th>Role</th>
+<th>Score</th>
+<th>Status</th>
+<th>Download</th>
+<th>Update</th>
+<th>Notes </th>
+<th>Action</th>
+</tr>
+</thead>
+
+<tbody>
 {% for r in results %}
 <tr>
 
-    <!-- Resume Name -->
-    <td>{{ r.resume_name }}</td>
+<td><strong>{{ r.resume_name }}</strong></td>
+<td>{{ r.title }}</td>
 
-    <!-- Applied Role -->
-    <td>{{ r.title }}</td>
+<td>
+<div class="progress-container">
+<div class="progress-bar" style="width: {{ r.match_score }}%;">
+{{ r.match_score }}%
+</div>
+</div>
+</td>
 
-    <!-- Match Score -->
-    <td>{{ r.match_score }}%</td>
+<td>
+<span class="badge {% if r.status == 'Selected' %}selected{% else %}rejected{% endif %}">
+{{ r.status }}
+</span>
+</td>
 
-    <!-- Status -->
-    <td>
-        {% if r.status == "Selected" %}
-            <span class="badge-selected">Selected</span>
-        {% else %}
-            <span class="badge-rejected">Rejected</span>
-        {% endif %}
-    </td>
+<td>
+<a href="/download/{{ r.id }}" class="btn btn-filter">Download</a>
+</td>
 
-    <!-- Download -->
-    <td>
-        <a href="/download/{{ r.id }}" class="btn-download">
-            Download
-        </a>
-    </td>
+<td>
+<form method="post" action="/update-candidate/{{ r.id }}">
+<div class="notes-box">
+
+<select name="status">
+<option {% if r.status == "Applied" %}selected{% endif %}>Applied</option>
+<option {% if r.status == "Shortlisted" %}selected{% endif %}>Shortlisted</option>
+<option {% if r.status == "Interview" %}selected{% endif %}>Interview</option>
+<option {% if r.status == "Offered" %}selected{% endif %}>Offered</option>
+<option {% if r.status == "Hired" %}selected{% endif %}>Hired</option>
+<option {% if r.status == "Rejected" %}selected{% endif %}>Rejected</option>
+</select>
+
+<div style="display:flex; gap:10px;">
+<button type="submit" class="btn btn-update">Update</button>
+</div>
+</div>
+<form>
+</td>
+
+<td>
+<textarea name="notes" rows="2" placeholder="Add internal notes...">{{ r.notes }}</textarea>
+</td>
+<td>
+<a href="/delete/{{ r.id }}" 
+onclick="return confirm('Are you sure?')"
+class="btn btn-delete">Delete</a>
+</td>
+</div>
 
 </tr>
 {% endfor %}
 </tbody>
-    </table>
+</table>
+
+</div>
 
 </div>
 

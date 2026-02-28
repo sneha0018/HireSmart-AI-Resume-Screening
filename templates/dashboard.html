@@ -331,7 +331,8 @@ style="padding:10px; border-radius:10px; border:1px solid #cbd5e1;">
 {% for r in results %}
 <tr>
 
-<td><strong>{{ r.resume_name }}</strong></td>
+<td><strong>{{ r.resume_name }} {{ r.name }}
+{{ r.email }}</strong></td>
 <td>{{ r.title }}</td>
 
 <td>
@@ -354,24 +355,20 @@ style="padding:10px; border-radius:10px; border:1px solid #cbd5e1;">
 
 <td>
 <form method="post" action="/update-candidate/{{ r.id }}">
-<div class="notes-box">
 
-<select name="status">
-<option {% if r.status == "Applied" %}selected{% endif %}>Applied</option>
-<option {% if r.status == "Shortlisted" %}selected{% endif %}>Shortlisted</option>
-<option {% if r.status == "Interview" %}selected{% endif %}>Interview</option>
-<option {% if r.status == "Offered" %}selected{% endif %}>Offered</option>
-<option {% if r.status == "Hired" %}selected{% endif %}>Hired</option>
-<option {% if r.status == "Rejected" %}selected{% endif %}>Rejected</option>
-</select>
+    <select name="status">
+        <option {% if r.status == "Applied" %}selected{% endif %}>Applied</option>
+        <option {% if r.status == "Shortlisted" %}selected{% endif %}>Shortlisted</option>
+        <option {% if r.status == "Interview" %}selected{% endif %}>Interview</option>
+        <option {% if r.status == "Offered" %}selected{% endif %}>Offered</option>
+        <option {% if r.status == "Hired" %}selected{% endif %}>Hired</option>
+        <option {% if r.status == "Rejected" %}selected{% endif %}>Rejected</option>
+    </select>
 
-<div style="display:flex; gap:10px;">
-<button type="submit" class="btn btn-update">Update</button>
-</div>
-</div>
-<form>
+    <button type="submit" class="btn btn-update">Update</button>
+
+</form>
 </td>
-
 <td>
 <textarea name="notes" rows="2" placeholder="Add internal notes...">{{ r.notes }}</textarea>
 </td>

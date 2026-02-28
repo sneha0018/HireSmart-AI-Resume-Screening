@@ -6,49 +6,201 @@
 </head>
 <body>
 
-<div class="container">
+<!-- NAVBAR -->
+<div class="navbar">
+    <h1>HireSmart AI</h1>
+    <div>
+        <a href="/candidate-profile">My Profile</a>
+        <a href="/logout">Logout</a>
+    </div>
+</div>
 
-    <h2>Available Jobs</h2>
+<div class="candidate-container">
 
-    <table border="1" cellpadding="10">
+    <!-- STATS SECTION -->
+    <div class="section-title">Dashboard Overview</div>
+
+    <div class="stats">
+        <div class="card total">
+            Total <br> {{ total_applications }}
+        </div>
+
+        <div class="card selected">
+            Selected <br> {{ selected_count }}
+        </div>
+
+        <div class="card rejected">
+            Rejected <br> {{ rejected_count }}
+        </div>
+
+        <div class="card pending">
+            Pending <br> {{ pending_count }}
+        </div>
+    </div>
+
+    <!-- CHART -->
+    <div class="chart-box">
+        <canvas id="statusChart"></canvas>
+    </div>
+
+    <!-- AVAILABLE JOBS -->
+    <div class="section-title">Available Jobs</div>
+             <form method="get" action="/candidate-dashboard" style="margin-bottom:20px;">
+    <input 
+        type="text" 
+        name="search" 
+        placeholder="Search jobs by title..."
+        value="{{ request.query_params.get('search', '') }}"
+        style="padding:8px 12px; width:250px; border-radius:8px; border:1px solid #ccc;"
+    >
+    <button type="submit" class="apply-btn">
+        Search
+    </button>
+</form>
+    <table class="candidate-table">
         <tr>
             <th>Title</th>
             <th>Description</th>
             <th>Action</th>
         </tr>
+
         {% for job in jobs %}
         <tr>
-            <td>{{ job[1] }}</td>
-            <td>{{ job[2] }}</td>
+            <td>{{ job.title }}</td>
+            <td>{{ job.description }}</td>
             <td>
-                <a href="/apply/{{ job[0] }}">Apply</a>
+                {% if job.id in applied_jobs %}
+                    <button class="disabled-btn" disabled>Already Applied</button>
+                {% else %}
+                    <a href="/apply/{{ job.id }}">
+                        <button class="apply-btn">Apply</button>
+                    </a>
+                {% endif %}
             </td>
         </tr>
         {% endfor %}
     </table>
 
-    <br><br>
+    <!-- MY APPLICATIONS -->
+    <div class="filter-bar">
+    <form method="get" action="/candidate-dashboard">
 
-    <h2>My Applications</h2>
+        <input type="text" 
+               name="search" 
+               placeholder="Search jobs..." 
+               value="{{ request.query_params.get('search', '') }}">
 
-    <table border="1" cellpadding="10">
+        <select name="status">
+            <option value="All">All Status</option>
+            <option value="Selected" {% if request.query_params.get('status') == "Selected" %}selected{% endif %}>Selected</option>
+            <option value="Rejected" {% if request.query_params.get('status') == "Rejected" %}selected{% endif %}>Rejected</option>
+            <option value="Applied" {% if request.query_params.get('status') == "Applied" %}selected{% endif %}>Applied</option>
+        </select>
+
+        <button type="submit" class="search-btn">Search</button>
+
+    </form>
+</div>
+    <table class="candidate-table">
         <tr>
             <th>Job</th>
             <th>Match Score</th>
             <th>Status</th>
             <th>HR Notes</th>
+            <th>Action</th>
         </tr>
+
         {% for app in applications %}
         <tr>
-            <td>{{ app[1] }}</td>
-            <td>{{ app[2] }}%</td>
-            <td>{{ app[3] }}</td>
-            <td>{{ app[4] }}</td>
+            <td>{{ app.title }}</td>
+
+               <td>
+    {% set score = app.match_score | float %}
+    <div class="score-bar">
+        <div class="score-fill 
+            {% if score >= 70 %}badge-selected
+            {% elif score >= 40 %}badge-pending
+            {% else %}badge-rejected
+            {% endif %}"
+            style="width: {{ score }}%;">
+            {{ score }}%
+        </div>
+    </div>
+</td>
+
+            <td>
+                {% if app.status == "Selected" %}
+                    <span class="badge badge-selected">Selected</span>
+                {% elif app.status == "Rejected" %}
+                    <span class="badge badge-rejected">Rejected</span>
+                {% else %}
+                    <span class="badge badge-pending">Applied</span>
+                {% endif %}
+                <div class="timeline">
+    <div class="step active">Applied</div>
+    <div class="step 
+        {% if app.status != 'Applied' %}active{% endif %}">
+        Under Review
+    </div>
+    <div class="step 
+        {% if app.status == 'Selected' %}active
+        {% elif app.status == 'Rejected' %}rejected
+        {% endif %}">
+        {{ app.status }}
+    </div>
+</div>
+            </td>
+
+            <td>{{ app.notes }}</td>
+
+            <td>
+                {% if app.status == "Selected" %}
+                    <button class="disabled-btn" disabled>Cannot Withdraw</button>
+                {% else %}
+                    <a href="/withdraw/{{ app.application_id }}"
+                       onclick="return confirm('Are you sure you want to withdraw?');">
+                        <button class="withdraw-btn">Withdraw</button>
+                    </a>
+                {% endif %}
+            </td>
         </tr>
         {% endfor %}
     </table>
 
 </div>
+
+<!-- CHART SCRIPT -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+const ctx = document.getElementById('statusChart');
+
+new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: ['Selected', 'Rejected', 'Pending'],
+        datasets: [{
+            data: [
+                {{ selected_count }},
+                {{ rejected_count }},
+                {{ pending_count }}
+            ],
+            backgroundColor: ['#1cc88a', '#e74a3b', '#f6c23e']
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: { stepSize: 1 }
+            }
+        }
+    }
+});
+</script>
 
 </body>
 </html>

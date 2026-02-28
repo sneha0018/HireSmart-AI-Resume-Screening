@@ -1,22 +1,30 @@
-/* Import Font */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+/* ==============================
+   GLOBAL
+============================== */
 
 body {
-    font-family: 'Poppins', sans-serif;
     margin: 0;
-    background: linear-gradient(135deg, #eef2ff, #fdf2f8);
-    color: #1e293b;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #f4f6fb;
+    color: #333;
 }
 
-/* Navbar */
+/* ==============================
+   NAVBAR
+============================== */
+
 .navbar {
-    background: linear-gradient(90deg, #2563eb, #7c3aed);
-    padding: 15px 40px;
-    color: white;
-    font-weight: 600;
+    background: linear-gradient(90deg, #4e73df, #7b2ff7);
+    padding: 16px 40px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    color: white;
+}
+
+.navbar h1 {
+    margin: 0;
+    font-size: 20px;
 }
 
 .navbar a {
@@ -30,52 +38,295 @@ body {
     opacity: 0.8;
 }
 
-/* Card */
-.card {
-    background: white;
-    padding: 30px;
-    border-radius: 14px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+/* ==============================
+   MAIN CONTAINER
+============================== */
+
+.candidate-container {
+    max-width: 1100px;
+    margin: 40px auto;
+    padding: 0 20px;
 }
 
-/* Buttons */
-.btn-primary {
-    background: linear-gradient(90deg, #2563eb, #7c3aed);
-    color: white;
-    border: none;
-    padding: 12px;
-    border-radius: 8px;
+/* ==============================
+   SECTION TITLE
+============================== */
+
+.section-title {
+    font-size: 22px;
     font-weight: 600;
-    cursor: pointer;
+    margin: 40px 0 20px 0;
+}
+
+/* ==============================
+   DASHBOARD CARDS
+============================== */
+
+.stats {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 40px;
+}
+
+.card {
+    flex: 1;
+    min-width: 200px;
+    height: 110px;
+    border-radius: 14px;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-weight: 600;
+    font-size: 18px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
     transition: 0.3s ease;
 }
 
-.btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+.card:hover {
+    transform: translateY(-5px);
 }
 
-/* Inputs */
-input, textarea {
+.total {
+    background: linear-gradient(135deg, #4e73df, #224abe);
+}
+
+.selected {
+    background: linear-gradient(135deg, #1cc88a, #13855c);
+}
+
+.rejected {
+    background: linear-gradient(135deg, #e74a3b, #c0392b);
+}
+
+.pending {
+    background: linear-gradient(135deg, #f6c23e, #d4a017);
+    color: #333;
+}
+
+/* ==============================
+   CHART BOX
+============================== */
+
+.chart-box {
+    background: white;
+    padding: 25px;
+    border-radius: 14px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+    margin-bottom: 50px;
+    height: 300px;
+}
+
+/* ==============================
+   TABLE
+============================== */
+
+.candidate-table {
     width: 100%;
-    padding: 12px;
-    border-radius: 8px;
-    border: 1px solid #cbd5e1;
-    margin-top: 8px;
-    margin-bottom: 15px;
-    font-family: 'Poppins';
+    border-collapse: collapse;
+    background: white;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+    margin-bottom: 40px;
 }
 
-/* Stats Cards */
-.stat-box {
+.candidate-table th {
+    background: #f8f9fc;
+    padding: 15px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.candidate-table td {
+    padding: 14px;
+    border-bottom: 1px solid #eee;
+    font-size: 14px;
+}
+
+.candidate-table tr:last-child td {
+    border-bottom: none;
+}
+
+.candidate-table tr:hover {
+    background: #f9fafc;
+}
+
+/* ==============================
+   BUTTONS
+============================== */
+
+.apply-btn {
+    background: #4e73df;
+    color: white;
+    padding: 7px 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.apply-btn:hover {
+    background: #2e59d9;
+}
+
+.withdraw-btn {
+    background: #e74a3b;
+    color: white;
+    padding: 7px 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.withdraw-btn:hover {
+    background: #c0392b;
+}
+
+.disabled-btn {
+    background: #858796;
+    color: white;
+    padding: 7px 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: not-allowed;
+}
+
+/* ==============================
+   STATUS BADGES
+============================== */
+
+.badge {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    color: white;
+}
+
+.badge-selected {
+    background: #1cc88a;
+}
+
+.badge-rejected {
+    background: #e74a3b;
+}
+
+.badge-pending {
+    background: #f6c23e;
+    color: #333;
+}
+
+/* ==============================
+   MATCH SCORE BAR
+============================== */
+
+.score-bar {
+    background: #e9ecef;
+    border-radius: 8px;
+    width: 160px;
+    height: 20px;
+    overflow: hidden;
+}
+
+.score-fill {
+    height: 100%;
+    text-align: center;
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* ==============================
+   RESPONSIVE
+============================== */
+
+@media (max-width: 768px) {
+    .stats {
+        flex-direction: column;
+    }
+
+    .chart-box {
+        height: 250px;
+    }
+}
+
+
+/* ==============================
+   TIMELINE
+============================== */
+
+.timeline {
+    display: flex;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.step {
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    background: #e0e0e0;
+    color: #555;
+}
+
+.step.active {
+    background: #4e73df;
+    color: white;
+}
+
+.step.rejected {
+    background: #e74a3b;
+    color: white;
+}
+
+
+/* ===============================
+   FILTER BAR
+=============================== */
+
+.filter-bar {
+    background: white;
     padding: 20px;
     border-radius: 12px;
-    color: white;
-    font-weight: 600;
-    font-size: 20px;
-    text-align: center;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    margin-bottom: 30px;
 }
 
-.blue { background: linear-gradient(90deg,#2563eb,#3b82f6); }
-.green { background: linear-gradient(90deg,#16a34a,#22c55e); }
-.red { background: linear-gradient(90deg,#dc2626,#ef4444); }
+.filter-bar form {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.filter-bar input {
+    flex: 1;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.filter-bar select {
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    font-size: 14px;
+}
+
+.search-btn {
+    background: #4e73df;
+    color: white;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.search-btn:hover {
+    background: #2e59d9;
+}

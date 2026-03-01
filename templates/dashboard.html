@@ -267,17 +267,17 @@ HireSmart AI Admin
 <div class="stats-row">
 <div class="stat-box blue">
 <div class="stat-title">Total Resumes</div>
-<div class="stat-number">{{ total }}</div>
+<div class="stat-number">{{ total_resumes }}</div>
 </div>
 
 <div class="stat-box green">
 <div class="stat-title">Selected</div>
-<div class="stat-number">{{ selected }}</div>
+<div class="stat-number">{{ selected_count }}</div>
 </div>
 
 <div class="stat-box red">
 <div class="stat-title">Rejected</div>
-<div class="stat-number">{{ rejected }}</div>
+<div class="stat-number">{{ rejected_count }}</div>
 </div>
 </div>
 
@@ -363,6 +363,7 @@ style="padding:10px; border-radius:10px; border:1px solid #cbd5e1;">
         <option {% if r.status == "Offered" %}selected{% endif %}>Offered</option>
         <option {% if r.status == "Hired" %}selected{% endif %}>Hired</option>
         <option {% if r.status == "Rejected" %}selected{% endif %}>Rejected</option>
+        <option {% if r.status == "selected" %}selected{% endif %}>selected</option>   
     </select>
 
     <button type="submit" class="btn btn-update">Update</button>

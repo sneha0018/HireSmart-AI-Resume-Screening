@@ -15,20 +15,20 @@
 </div>
 
 <div style="display:flex; justify-content:center; margin-top:80px;">
-    <div class="card" style="width:600px;">
-        <h2>Create New Job Posting</h2>
+    <div class="chart-box" style="width:600px;">
+        <h2 style="margin-bottom:20px;">Create New Job Posting</h2>
 
-        <form action="/create-job" method="post">
+        <form action="/create-job" method="post" style="display:flex; flex-direction:column; gap:15px;">
+            
             <label>Job Title</label>
             <input type="text" name="title" required>
 
             <label>Job Description</label>
-            <textarea name="description" required></textarea>
+            <textarea name="description" rows="4" required></textarea>
 
-            <button class="btn-primary">Create Job</button>
+            <button class="search-btn">Create Job</button>
         </form>
     </div>
 </div>
-
 </body>
 </html>

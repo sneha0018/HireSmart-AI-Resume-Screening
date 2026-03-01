@@ -177,10 +177,6 @@ def logout(request: Request):
 # -----------------------------
 # PUBLIC PAGES
 # -----------------------------
-@app.get("/", response_class=HTMLResponse)
-def home(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
-
 
 @app.get("/about", response_class=HTMLResponse)
 def about(request: Request):
@@ -390,7 +386,13 @@ def dashboard(request: Request):
     # Execute
     cursor.execute(query, values)
     results = cursor.fetchall()
+# -------------------------
+# Dashboard Stats
+# -------------------------
 
+    total_resumes = len(results)
+    selected_count = len([r for r in results if r["status"] == "Selected"])
+    rejected_count = len([r for r in results if r["status"] == "Rejected"])
     conn.close()
 
     return templates.TemplateResponse(
@@ -399,7 +401,10 @@ def dashboard(request: Request):
             "request": request,
             "results": results,
             "jobs": jobs,
-            "selected_job": selected_job
+            "selected_job": selected_job,
+            "total_resumes": total_resumes,
+            "selected_count": selected_count,
+            "rejected_count": rejected_count
         },
     )
 #-------------------------------
@@ -442,6 +447,22 @@ def analytics(request: Request):
         GROUP BY j.title
     """)
     job_data = cursor.fetchall()
+    # -------------------------
+# Status Counts
+# -------------------------
+
+    # -------------------------
+# Status Counts
+# -------------------------
+
+    cursor.execute("SELECT COUNT(*) FROM applications")
+    total_resumes = list(cursor.fetchone().values())[0]
+
+    cursor.execute("SELECT COUNT(*) FROM applications WHERE status = 'Selected'")
+    selected_count = list(cursor.fetchone().values())[0]
+
+    cursor.execute("SELECT COUNT(*) FROM applications WHERE status = 'Rejected'")
+    rejected_count = list(cursor.fetchone().values())[0]
 
     conn.close()
 
@@ -449,11 +470,11 @@ def analytics(request: Request):
         "analytics.html",
         {
             "request": request,
-            "total_applications": total_applications,
-            "total_jobs": total_jobs,
-            "total_candidates": total_candidates,
-            "status_data": status_data,
+            "total_resumes": total_resumes,
+            "selected_count": selected_count,
+            "rejected_count": rejected_count,
             "job_data": job_data
+
         }
     )
 # -----------------------------
@@ -908,8 +929,8 @@ def apply_page(request: Request, job_id: int):
 
 def send_status_email(to_email, candidate_name, job_title, status):
 
-    sender_email = "sneha18012004@gmail.com"
-    sender_password = "openpmhepbpyxsir"
+    sender_email = os.getenv("EMAIL_USER")
+    sender_password = os.getenv("EMAIL_PASS")
 
     subject = f"Application Status Update - {job_title}"
 
@@ -992,3 +1013,12 @@ async def update_candidate(
     send_status_email(email, name, job_title, status)
 
     return RedirectResponse(url="/dashboard", status_code=302)
+#-------------------------------
+#HOME///////
+#-------------------------------
+@app.get("/", response_class=HTMLResponse)
+def home(request: Request):
+    return templates.TemplateResponse(
+        "home.html",
+        {"request": request}
+    )
